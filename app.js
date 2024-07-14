@@ -143,8 +143,10 @@ app.post('/signin', (req,res)=>{
     }).catch((err)=>{
         console.log(err)
     })
-})
+})  
 
+
+//home page
 app.get('/', protectAdminRoute, async (req,res)=>{
     const users = await userSchema.find()
     res.render('index', {users: users})
