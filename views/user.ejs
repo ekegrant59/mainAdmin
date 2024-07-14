@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= user.name %></title>
+    <%- include('partials/headlinks') %>
+</head>
+<body>
+    <div class="p-4">
+        <div class="">
+            <a href="/" class="bg-gray-400 float-left px-3 py-2 rounded-lg">Back</a>
+            <p class="text-3xl text-center pb-4"><%= user.name %>'s Account</p>
+            <div class="px-5 mx-auto pb-3 max-w-xl">
+                <%- messages('messages') %> 
+            </div>
+        </div>
+        <div class="flex flex-wrap justify-center w-full gap-8 px-4">
+            <div class="w-full max-w-lg p-4 ">
+                <form action="/update/<%= user.id %>" method="post">
+                    <div>
+                        <label
+                          for="name"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Fullname</label
+                        >
+                        <input
+                          type="text"
+                          name="name"
+                          id="name"
+                          value="<%= user.name %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="Full name"
+                          required />
+                      </div>
+                    <div class="mt-3">
+                        <label
+                          for="email"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Email</label
+                        >
+                        <input
+                          type="email"
+                          name="email"
+                          id="email"
+                          value="<%= user.email %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="johndoe@gmail.com"
+                          required />
+                      </div>
+                    <div class="mt-3">
+                        <label
+                          for="password"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Password</label
+                        >
+                        <input
+                          type="text"
+                          name="password"
+                          id="password"
+                          value="<%= user.password2 %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="******"
+                          required />
+                      </div>
+                    <div class="mt-4">
+                        <label
+                          for="name"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Address</label
+                        >
+                        <input
+                          type="text"
+                          name="address"
+                          id="address"
+                          value="<%= user.address %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="Address"
+                          required />
+                    </div>
+                    <div class="mt-4">
+                        <label for="country" class="block mb-2 text-sm font-medium text-gray-600">Choose a Gender</label>
+                        <select required id="gender" class="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-customTeal focus:border-customTeal block w-full p-2.5" name="country">
+                            <option selected value="<%= user.Gender %>"><%= user.Gender %></option>
+                            <option  value="male">Male</option>
+                            <option  value="female">Female</option>
+                        </select>
+                    </div>
+                    <div class="mt-3">
+                        <label
+                          for="dob"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Date of Birth</label
+                        >
+                        <input
+                          type="date"
+                          name="dob"
+                          id="dob"
+                          value="<%= user.DateOfBirth %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="Date Of Birth"
+                          required/>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-400 rounded-xl py-2 my-3">Update Account</button>
+    
+                </form>
+            </div>
+            <div class="">
+                <div>
+                    <p class="text-lg">Profile Picture:</p>
+                    <img src="<%= user.picture %>" alt="" class="w-64">
+                    <p class="pt-6 text-lg">Change Picture:</p>
+                    <form id="imageForm">
+                        <div>
+                            <div class=" mb-4">
+                                <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="image1" type="file" required>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-400 rounded-xl py-2" id="submitbtn">Update Image</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="my-10 flex flex-wrap justify-center w-full gap-12 px-4">
+            <div class="w-96">
+                <p class="font-medium text-lg">Update Account Status</p>
+                <form action="/updateAccount/<%= user.id %>" method="post">
+                    <div class="mt-4">
+                        <label
+                          for="number"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Account number</label
+                        >
+                        <input
+                          type="number"
+                          name="number"
+                          id="number"
+                          value="<%= user.account.number %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <div class="mt-4">
+                        <label
+                          for="balance"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Account Balance</label
+                        >
+                        <input
+                          type="number"
+                          name="balance"
+                          id="balance"
+                          value="<%= user.account.balance %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <div class="mt-4">
+                        <label
+                          for="cryptoBalance"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Crypto Balance</label
+                        >
+                        <input
+                          type="number"
+                          name="cryptoBalance"
+                          id="cryptoBalance"
+                          value="<%= user.account.cryptoBalance %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <div class="mt-4">
+                        <label
+                          for="withdrawals"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Withdrawals</label
+                        >
+                        <input
+                          type="number"
+                          name="withdrawals"
+                          id="withdrawals"
+                          value="<%= user.account.withdrawals %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <button type="submit" class="w-full bg-blue-400 rounded-xl py-2 my-3">Update Account Status</button>                    
+                </form>
+            </div>
+            <div class="w-96">
+                <p class="font-medium text-lg">Update Pins</p>
+                <form action="/updatePin/<%= user.id %>" method="post">
+                    <div class="mt-4">
+                        <label
+                          for="transfer"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Transfer Pin</label
+                        >
+                        <input
+                          type="number"
+                          name="transfer"
+                          id="transfer"
+                          value="<%= user.pin.transfer %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <div class="mt-4">
+                        <label
+                          for="imf"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >IMF Pin</label
+                        >
+                        <input
+                          type="number"
+                          name="imf"
+                          id="imf"
+                          value="<%= user.pin.imf %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <div class="mt-4">
+                        <label
+                          for="otp"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >OTP Pin</label
+                        >
+                        <input
+                          type="number"
+                          name="otp"
+                          id="otp"
+                          value="<%= user.pin.otp %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <div class="mt-4">
+                        <label
+                          for="tax"
+                          class="block mb-2 text-sm font-medium text-gray-800"
+                          >Tax Pin</label
+                        >
+                        <input
+                          type="number"
+                          name="tax"
+                          id="tax"
+                          value="<%= user.pin.tax %>"
+                          class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                          placeholder="account number"
+                          required />
+                    </div>
+                    <button type="submit" class="w-full bg-blue-400 rounded-xl py-2 my-3">Update Pin</button>                    
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <Script>
+         const submitbtn = document.getElementById('submitbtn')
+
+    document.getElementById('imageForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const image1 = document.getElementById('image1').files[0];
+        
+        // console.log(fullname, country, type, id)
+        submitbtn.innerText = 'Uploading....'
+        submitbtn.disabled = true
+
+        if (image1) {
+            uploadImage(image1).then(url1 => {
+                upload([url1]);
+            }).catch(error => {
+                console.error('Error uploading image 1:', error);
+                submitbtn.innerText = 'Image Upload Failed, Please Try Again'
+                submitbtn.disabled = false
+            });
+        } else {
+            alert('Please select both images.');
+        }
+    });
+
+    function uploadImage(image) {
+        const cloudName = 'dvk93z9vj'; // Replace with your Cloudinary cloud name
+        const uploadPreset = 'unsigned_preset'; // Replace with your Cloudinary upload preset
+
+        const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+        const formData = new FormData();
+        formData.append('file', image);
+        formData.append('upload_preset', uploadPreset);
+
+        return fetch(url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => data.secure_url)
+        .catch(error => {
+            console.error('Error uploading to Cloudinary:', error);
+            submitbtn.innerText = 'Upload Failed, Please Try Again'
+            throw error;
+        });
+    }
+
+    function upload([url1]) {
+        const additionalData= {
+          picture: url1
+        }
+        console.log(additionalData)
+
+        const formData1 = new FormData();
+
+        // Append additional data to the FormData object
+        for (const key in additionalData) {
+            if (additionalData.hasOwnProperty(key)) {
+                formData1.append(key, additionalData[key]);
+            }
+        }
+
+        const payload = new URLSearchParams(formData1)
+        fetch(`/updateImage/<%= user.id %>`, {
+                method:'POST',
+                body: payload
+            }).then(res =>{
+                if (res.ok){
+                    submitbtn.innerText = 'Image Updated Sucessfully' 
+                    location.reload(true)
+                }
+            }).catch(err =>{
+                console.log(err)
+                submitbtn.innerText = 'Failed, Please Try Again'
+                submitbtn.disabled = false
+            })
+    }
+
+</script>
+</body>
+</html>

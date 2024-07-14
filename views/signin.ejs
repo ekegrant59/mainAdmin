@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign In </title>
+    <%- include('partials/headlinks') %>
+</head>
+<body class="min-h-[100vh] py-12">
+    <div class="max-w-sm mx-auto p-5 h-full flex flex-col justify-center items-center"> 
+        <p class="text-xl text-center font-bold pb-4">Sign in to Admin Account</p>
+        <div class="px-5 mx-auto pb-3">
+            <%- messages('messages') %> 
+        </div>
+        <form class="space-y-4 md:space-y-6 w-full" action="/signin" method="post">
+            <div>
+              <label
+                for="email"
+                class="block mb-2 text-sm font-medium text-gray-800"
+                >Your email</label
+              >
+              <input
+                type="email"
+                name="email"
+                id="email"
+                class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                placeholder="name@email.com"
+                required />
+            </div>
+            <div>
+              <label
+                for="password"
+                class="block mb-2 text-sm font-medium text-gray-800"
+                >Password</label
+              >
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="••••••••"
+                class="bg-gray-50 border border-gray-300 text-gray-800 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                required />
+            </div>
+            <button
+              class="w-full text-white bg-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+              Sign In
+            </button>
+          </form>
+    </div>
+    
+</body>
+</html>

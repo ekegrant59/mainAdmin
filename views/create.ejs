@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <%- include('partials/headlinks') %>
+</head>
+<body>
+    <div class="p-4">
+        <div class="">
+            <a href="/" class="bg-gray-400 float-left px-3 py-2 rounded-lg">Back</a>
+            <p class="text-3xl text-center pb-4">Create an Account</p>
+        </div>
+        <div class="max-w-lg p-4 mx-auto">
+            <form action="/create" method="post" id="imageForm">
+                <div>
+                    <label
+                      for="name"
+                      class="block mb-2 text-sm font-medium text-gray-800"
+                      >Fullname</label
+                    >
+                    <input
+                      type="text"
+                      name="name"
+                      id="name"
+                      class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                      placeholder="Full name"
+                      required />
+                  </div>
+                <div class="mt-3">
+                    <label
+                      for="email"
+                      class="block mb-2 text-sm font-medium text-gray-800"
+                      >Email</label
+                    >
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                      placeholder="johndoe@gmail.com"
+                      required />
+                  </div>
+                <div class="mt-3">
+                    <label
+                      for="password"
+                      class="block mb-2 text-sm font-medium text-gray-800"
+                      >Password</label
+                    >
+                    <input
+                      type="password"
+                      name="password"
+                      id="password"
+                      class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                      placeholder="******"
+                      required />
+                  </div>
+                <div class="mt-3">
+                    <label
+                      for="password2"
+                      class="block mb-2 text-sm font-medium text-gray-800"
+                      >Confirm Password</label
+                    >
+                    <input
+                      type="password"
+                      name="password2"
+                      id="password2"
+                      class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                      placeholder="******"
+                      required />
+                      <p class="mt-1 text-sm text-red-500 hidden" id="passwordMatch">Passwords do not match</p>
+                  </div>
+                <div class="mt-4">
+                    <label
+                      for="name"
+                      class="block mb-2 text-sm font-medium text-gray-800"
+                      >Address</label
+                    >
+                    <input
+                      type="text"
+                      name="address"
+                      id="address"
+                      class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                      placeholder="Address"
+                      required />
+                </div>
+                <div class="mt-4">
+                    <label for="country" class="block mb-2 text-sm font-medium text-gray-600">Choose a Gender</label>
+                    <select required id="gender" class="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-customTeal focus:border-customTeal block w-full p-2.5" name="country">
+                        <option selected>Choose a Gender</option>
+                        <option  value="male">Male</option>
+                        <option  value="female">Female</option>
+                    </select>
+                </div>
+                <div class="mt-3">
+                    <label
+                      for="dob"
+                      class="block mb-2 text-sm font-medium text-gray-800"
+                      >Date of Birth</label
+                    >
+                    <input
+                      type="date"
+                      name="dob"
+                      id="dob"
+                      class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                      placeholder="Date Of Birth"
+                      required/>
+                </div>
+                <div class="mt-3 mb-8">                    
+                    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload Image</label>
+                    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="image1" type="file" required>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-400 rounded-xl py-2" id="submitbtn">Create Account</button>
+
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let passwordMatch  =  document.getElementById('passwordMatch')
+
+        password2.addEventListener('keyup', (e)=>{
+            const password =  document.getElementById('password').value
+            if (e.target.value != password){
+                submitbtn.disabled = true
+                passwordMatch.classList.remove('hidden')
+            } else{
+                submitbtn.disabled = false
+                passwordMatch.classList.add('hidden')
+            }
+        })
+
+
+        const submitbtn = document.getElementById('submitbtn')
+                                
+        document.getElementById('imageForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const image1 = document.getElementById('image1').files[0];
+            const name = document.getElementById('name').value
+            const gender = document.getElementById('gender').value
+            const email = document.getElementById('email').value
+            const password =  document.getElementById('password').value
+            const password2 =  document.getElementById('password2').value
+            const address =  document.getElementById('address').value
+            const dob =  document.getElementById('dob').value
+            
+            // console.log(fullname, country, type, id)
+            submitbtn.innerText = 'Creating....'
+            submitbtn.disabled = true
+
+            if (image1) {
+                uploadImage(image1).then(url1 => {
+                    create([url1, name, address, email, password, dob, gender]);
+                }).catch(error => {
+                    console.error('Error uploading image 1:', error);
+                    submitbtn.innerText = 'Image Upload Failed, Please Try Again'
+                    submitbtn.disabled = false
+                });
+            } else {
+                alert('Please select both images.');
+            }
+        });
+
+        function uploadImage(image) {
+            const cloudName = 'dvk93z9vj'; // Replace with your Cloudinary cloud name
+            const uploadPreset = 'unsigned_preset'; // Replace with your Cloudinary upload preset
+
+            const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+            const formData = new FormData();
+            formData.append('file', image);
+            formData.append('upload_preset', uploadPreset);
+
+            return fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => data.secure_url)
+            .catch(error => {
+                console.error('Error uploading to Cloudinary:', error);
+                submitbtn.innerText = 'Upload Failed, Please Try Again'
+                throw error;
+            });
+        }
+
+        function create([url1, name, address, email, password, dob, gender]) {
+            const additionalData= {
+              picture: url1,
+              name: name,
+              address: address,
+              email: email,
+              password: password,
+              dob: dob,
+              gender: gender
+            }
+            console.log(additionalData)
+
+            const formData1 = new FormData();
+
+            // Append additional data to the FormData object
+            for (const key in additionalData) {
+                if (additionalData.hasOwnProperty(key)) {
+                    formData1.append(key, additionalData[key]);
+                }
+            }
+
+            const payload = new URLSearchParams(formData1)
+            fetch('/create', {
+                    method:'POST',
+                    body: payload
+                }).then(res =>{
+                    if (res.ok){
+                        submitbtn.innerText = 'Account Created Sucessfully' 
+                    }
+                }).catch(err =>{
+                    console.log(err)
+                    submitbtn.innerText = 'Failed, Please Try Again'
+                    submitbtn.disabled = false
+                })
+        }
+
+    </script>
+</body>
+</html>
