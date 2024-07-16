@@ -80,10 +80,10 @@
                     </div>
                     <div class="mt-4">
                         <label for="country" class="block mb-2 text-sm font-medium text-gray-600">Choose a Gender</label>
-                        <select required id="gender" class="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-customTeal focus:border-customTeal block w-full p-2.5" name="country">
-                            <option selected value="<%= user.Gender %>"><%= user.Gender %></option>
-                            <option  value="male">Male</option>
-                            <option  value="female">Female</option>
+                        <select required id="gender" class="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-customTeal focus:border-customTeal block w-full p-2.5" name="gender">
+                            <option value="<%= user.Gender %>"><%= user.Gender %></option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
                         </select>
                     </div>
                     <div class="mt-3">
@@ -107,7 +107,7 @@
             </div>
             <div class="">
                 <div>
-                    <p class="text-lg">Profile Picture:</p>
+                    <p class="text-xl">Profile Picture:</p>
                     <img src="<%= user.picture %>" alt="" class="w-64">
                     <p class="pt-6 text-lg">Change Picture:</p>
                     <form id="imageForm">
@@ -124,7 +124,7 @@
         </div>
         <div class="my-10 flex flex-wrap justify-center w-full gap-12 px-4">
             <div class="w-96">
-                <p class="font-medium text-lg">Update Account Status</p>
+                <p class="font-medium text-xl">Update Account Status</p>
                 <form action="/updateAccount/<%= user.id %>" method="post">
                     <div class="mt-4">
                         <label
@@ -255,6 +255,99 @@
                     <button type="submit" class="w-full bg-blue-400 rounded-xl py-2 my-3">Update Pin</button>                    
                 </form>
             </div>
+        </div>
+        <div class="my-10 flex flex-wrap justify-center w-full gap-12 px-4">
+          <div class="min-w-96">
+            <p class="font-medium text-xl">View Transactions</p>
+            <div class="max-h-52 max-w-full overflow-auto mt-3">
+              <table>
+                <thead>
+                  <th>Narration</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Successful</th>
+                </thead>
+                <tbody>
+                  <% if (user.transaction.length > 0) { %>
+                    <% user.transaction.forEach(transaction => { %>
+                      <tr>
+                        <td class="px-4"><%=transaction.narration %></td>
+                        <td class="px-4"><%=transaction.date %></td>
+                        <td class="px-4"><%=transaction.amount %></td>
+                        <td class="px-4"><%=transaction.type %></td>
+                        <td class="px-4"><%=transaction.successful %></td>
+                      </tr>
+                    <% })%>
+                  <% } else{ %>
+                    <p class="text-center text-gray-600 text-sm">No transactions</p>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="min-w-96">
+            <p class="font-medium text-xl pb-4">Add Transaction</p>
+            <form action="/addTransaction/<%= user.id %>" method="post">
+              <div>
+                <label
+                  for="narration"
+                  class="block mb-2 text-sm font-medium text-gray-800"
+                  >Narration</label
+                >
+                <input
+                  type="text"
+                  name="narration"
+                  id="narration"
+                  class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                  placeholder="Narration"
+                  required />
+              </div>
+              <div class="mt-3">
+                <label
+                  for="date"
+                  class="block mb-2 text-sm font-medium text-gray-800"
+                  >Date and Time</label
+                >
+                <input
+                  type="datetime-local"
+                  name="date"
+                  id="date"
+                  class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                  placeholder="Date Of Transaction"
+                  required/>
+            </div>
+              <div class="mt-3">
+                <label
+                  for="amount"
+                  class="block mb-2 text-sm font-medium text-gray-800"
+                  >Amount</label
+                >
+                <input
+                  type="number"
+                  name="amount"
+                  id="amount"
+                  class="bg-gray-50 border border-gray-300 rounded-lg focus:ring-customPurple focus:border-customPurple block w-full p-2.5"
+                  placeholder="Amount"
+                  required />
+              </div>
+              <div class="mt-3">
+                <label for="type" class="block mb-2 text-sm font-medium text-gray-600">Type</label>
+                <select required id="type" class="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-customTeal focus:border-customTeal block w-full p-2.5" name="type">
+                    <option selected value="deposit">Deposit</option>
+                    <option value="withdrawal">Withdrawal</option>
+                </select>
+            </div>
+              <div class="mt-3">
+                <label for="successful" class="block mb-2 text-sm font-medium text-gray-600">Successful</label>
+                <select required id="successful" class="bg-gray-50 border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-customTeal focus:border-customTeal block w-full p-2.5" name="successful">
+                    <option selected value="true">true</option>
+                    <option value="false">false</option>
+                </select>
+            </div>
+            <button type="submit" class="w-full bg-blue-400 rounded-xl py-2 my-3">Create Transaction</button> 
+            </form>
+          </div>
         </div>
     </div>
 

@@ -7,7 +7,7 @@ const transactionSchema = new mongoose.Schema({
    date: String,
    amount: Number,
    type: String,
-   successful: Boolean
+   successful: String
 })
 
 module.exports = mongoose.model('transaction', transactionSchema)

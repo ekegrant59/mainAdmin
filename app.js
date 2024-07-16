@@ -263,8 +263,18 @@ app.post('/updateAccount/:id', async (req,res)=>{
             req.flash('danger', 'An Error Occured, Please try again')
             res.redirect(`/${id}`)
         }else{
-            req.flash('success', 'Account Updated Sucessfully')
-            res.redirect(`/${id}`)
+            // console.log(dets)
+            userSchema.findByIdAndUpdate(id, {$set:{account: dets._id}}, {new: true}, (error,details)=>{
+                if (error){
+                    console.log(err)
+                    req.flash('danger', 'An Error Occured, Please try again')
+                    res.redirect(`/${id}`)
+                } else{
+                    req.flash('success', 'Account Updated Sucessfully')
+                    res.redirect(`/${id}`)
+                    // console.log(details)
+                }
+            })
         }
     })
 })
@@ -279,17 +289,28 @@ app.post('/updatePin/:id', async (req,res)=>{
     // console.log(user.account)
 
     const filter ={id: user.pin}
+    // console.log(filter)
 
     // const account = await accountSchema.findOne(filter)
 
-    pinSchema.findOneAndUpdate(filter, {$set:{transfer: transfer, imf: imf, otp: otp, tax: tax }} , {new: true}, (err,dets)=>{
+    pinSchema.findOneAndUpdate(filter, {$set: {transfer: transfer, imf: imf, otp: otp, tax: tax }} , {new: true}, (err,dets)=>{
         if (err){
             console.log(err)
             req.flash('danger', 'An Error Occured, Please try again')
             res.redirect(`/${id}`)
         }else{
-            req.flash('success', 'Pin Updated Sucessfully')
-            res.redirect(`/${id}`)
+            // console.log(dets)
+            userSchema.findByIdAndUpdate(id, {$set:{pin: dets._id}}, {new: true}, (error,details)=>{
+                if (error){
+                    console.log(err)
+                    req.flash('danger', 'An Error Occured, Please try again')
+                    res.redirect(`/${id}`)
+                } else{
+                    req.flash('success', 'Pin Updated Sucessfully')
+                    res.redirect(`/${id}`)
+                    // console.log(details)
+                }
+            })
         }
     })
 })
@@ -309,11 +330,48 @@ app.post('/updateImage/:id', async (req,res)=>{
     })
 })
 
+app.post('/addTransaction/:id', async (req,res)=>{
+    const id = req.params.id
+
+    const {narration, date, amount, type, successful} = req.body
+
+    // console.log(narration, date, amount, type, successful)
+
+    const transaction = new transactionSchema({
+        narration: narration,
+        date: date,
+        amount: amount,
+        type: type,
+        successful: successful
+    })
+
+    await transaction.save()
+
+    userSchema.findByIdAndUpdate(id, {$push: {transaction: transaction._id}}, {new: true})
+    .then(()=>{
+        req.flash('success', 'Transaction created Sucessfully')
+        res.redirect(`/${id}`)
+    }).catch((err)=>{
+        console.log(err)
+        req.flash('danger', 'An Error Occured, Please try again')
+        res.redirect(`/${id}`)
+    })
+})
+
 app.get('/:id', async (req,res)=>{
     const id = req.params.id
 
     const user = await userSchema.findById(id).populate('account').populate('pin').populate('transaction')
     res.render('user', {user, user})
+})
+
+app.get('/getTransactions/:id', async (req,res)=>{
+    const id = req.params.id
+
+    const user = await userSchema.findById(id).populate('account').populate('pin').populate('transaction')
+    const transactions = user.transaction
+
+    res.send(transactions)
 })
 
 
