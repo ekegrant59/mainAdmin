@@ -11,6 +11,8 @@ const accountSchema = require('./schema/accountSchema')
 const pinSchema = require('./schema/pinSchema')
 const transactionSchema = require('./schema/transactionSchema')
 const userSchema = require('./schema/userSchema')
+const cryptoTransSchema = require('./schema/cryptoTransSchema')
+const cardSchema = require('./schema/cardSchema')
 
 const secretkey = process.env.SECRETKEY
 const adminkey = process.env.ADMINKEY
@@ -163,7 +165,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
     const hashedPassword = await bcrypt.hash(password, salt)
     let pinId
     let accountId
-
+    let cardId
 
     createPins()
     async function createPins(){
@@ -178,7 +180,21 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
             pinId = pin._id
             // console.log(pinId, pin._id)
             createAccounts()
+            createCards()
         } catch (error) {
+            console.log(error.message)
+        }
+    }
+
+    async function createCards(){
+        try{
+            const card = new cardSchema({
+                debit: 'inactive',
+                crypto: 'inactive'
+            })
+            await card.save()
+            cardId = card._id
+        } catch(error){
             console.log(error.message)
         }
     }
@@ -214,7 +230,8 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
                 DateOfBirth: dob,
                 picture: picture,
                 pin: pinId,
-                account: accountId
+                account: accountId,
+                card: cardId
             })        
             await user.save()  
             res.send('OK')  
@@ -335,11 +352,28 @@ app.post('/addTransaction/:id', async (req,res)=>{
 
     const {narration, date, amount, type, successful} = req.body
 
+    // Initial date string
+    let dateStr = date;
+
+    // Convert to a Date object
+    let newDate = new Date(dateStr);
+
+    // Format the date to the desired format
+    let formattedDate = newDate.toISOString().replace('T', ' ').replace(/\..+/, '');
+
+    // Ensure seconds are set to "00"
+    if (formattedDate.length === 16) {
+        formattedDate += ':00';
+    }
+
+    // console.log(formattedDate);
+
+
     // console.log(narration, date, amount, type, successful)
 
     const transaction = new transactionSchema({
         narration: narration,
-        date: date,
+        date: formattedDate,
         amount: amount,
         type: type,
         successful: successful
@@ -347,21 +381,112 @@ app.post('/addTransaction/:id', async (req,res)=>{
 
     await transaction.save()
 
-    userSchema.findByIdAndUpdate(id, {$push: {transaction: transaction._id}}, {new: true})
-    .then(()=>{
-        req.flash('success', 'Transaction created Sucessfully')
-        res.redirect(`/${id}`)
-    }).catch((err)=>{
-        console.log(err)
-        req.flash('danger', 'An Error Occured, Please try again')
-        res.redirect(`/${id}`)
+    const user = await userSchema.findById(id)
+    const accountId = user.account
+
+    const accountStats = await accountSchema.findById(accountId)
+    const balance = accountStats.balance
+
+    let  newBalance = balance
+    if (transaction.successful == 'true'){
+        if (transaction.type == 'deposit'){
+            newBalance = balance + Number(amount)
+        } else {
+            newBalance = balance - Number(amount)
+        }
+    }
+    
+    accountSchema.findByIdAndUpdate(accountId, {$set: {balance: newBalance}}, {new: true}, (err,dets)=>{
+        if (err){
+            console.log(err)
+            req.flash('danger', 'An Error Occured, Please try again')
+            res.redirect(`/${id}`)
+        }else{
+            userSchema.findByIdAndUpdate(id, {$push: {transaction: transaction._id}, $set: {account: dets._id}}, {new: true})
+            .then(()=>{
+                req.flash('success', 'Transaction created Sucessfully')
+                res.redirect(`/${id}`)
+            }).catch((err)=>{
+                console.log(err)
+                req.flash('danger', 'An Error Occured, Please try again')
+                res.redirect(`/${id}`)
+            })
+        }
     })
+
+    
+})
+
+app.post('/addCryptoTransaction/:id', async (req,res)=>{
+    const id = req.params.id
+
+    const {date, amount, type} = req.body
+
+    // Initial date string
+    let dateStr = date;
+
+    // Convert to a Date object
+    let newDate = new Date(dateStr);
+
+    // Format the date to the desired format
+    let formattedDate = newDate.toISOString().replace('T', ' ').replace(/\..+/, '');
+
+    // Ensure seconds are set to "00"
+    if (formattedDate.length === 16) {
+        formattedDate += ':00';
+    }
+
+    // console.log(formattedDate);
+
+
+    // console.log(narration, date, amount, type, successful)
+
+    const cryptotransaction = new cryptoTransSchema({
+        date: formattedDate,
+        amount: amount,
+        type: type
+    })
+
+    await cryptotransaction.save()
+
+    const user = await userSchema.findById(id)
+    const accountId = user.account
+
+    const accountStats = await accountSchema.findById(accountId)
+    const balance = accountStats.cryptoBalance
+
+    let  newBalance
+    if (cryptotransaction.type == 'deposit'){
+        newBalance = balance + Number(amount)
+    } else {
+        newBalance = balance - Number(amount)
+    }
+
+    accountSchema.findByIdAndUpdate(accountId, {$set: {cryptoBalance: newBalance}}, {new: true}, (err,dets)=>{
+        if (err){
+            console.log(err)
+            req.flash('danger', 'An Error Occured, Please try again')
+            res.redirect(`/${id}`)
+        }else{
+            userSchema.findByIdAndUpdate(id, {$push: {cryptotransaction: cryptotransaction._id}, $set: {account: dets._id}}, {new: true})
+            .then(()=>{
+                req.flash('success', 'Crypto Transaction created Sucessfully')
+                res.redirect(`/${id}`)
+            }).catch((err)=>{
+                console.log(err)
+                req.flash('danger', 'An Error Occured, Please try again')
+                res.redirect(`/${id}`)
+            })
+        }
+    })
+
+    
 })
 
 app.get('/:id', async (req,res)=>{
     const id = req.params.id
 
-    const user = await userSchema.findById(id).populate('account').populate('pin').populate('transaction')
+    const user = await userSchema.findById(id).populate('account').populate('pin').populate('transaction').populate('cryptotransaction').populate('card')
     res.render('user', {user, user})
 })
 
@@ -372,6 +497,147 @@ app.get('/getTransactions/:id', async (req,res)=>{
     const transactions = user.transaction
 
     res.send(transactions)
+})
+
+app.get('/deleteTransaction/:userId/:id', async (req,res)=>{
+    const userId = req.params.userId
+    const id = req.params.id
+
+    const transaction = await transactionSchema.findById(id)
+    const amount = transaction.amount
+
+    const user = await userSchema.findById(userId)
+    const accountId = user.account
+    const account = await accountSchema.findById(accountId)
+    const balance = account.balance
+
+    let newBalance
+    if (transaction.type == 'deposit'){
+        newBalance = balance - amount
+    }else{
+        newBalance = balance + amount
+    }
+
+    transactionSchema.findByIdAndDelete(id)
+    .then(result =>{
+        // console.log(result)
+        accountSchema.findByIdAndUpdate(accountId, {$set: {balance: newBalance}}, {new: true}, (err, dets)=>{
+            if (err){
+                console.log(err)
+                req.flash('danger', 'An Error Occured, Please try again')
+                res.redirect(`/${id}`)
+            }else{
+                userSchema.findByIdAndUpdate(userId, {$pull: {transaction: id}, $set: {account: dets.id}})
+                .then(()=>{
+                    req.flash('success', 'Transaction Deleted Sucessfully')
+                    res.redirect(`/${userId}`)
+                }).catch((err)=>{
+                    console.log(err)
+                    req.flash('danger', 'An Error Occured, Please try again')
+                    res.redirect(`/${userId}`)
+                })
+            }
+        })
+        
+    }).catch((err)=>{
+        console.log(err)
+        req.flash('danger', 'An Error Occured, Please try again')
+        res.redirect(`/${userId}`)
+    })
+})
+
+app.get('/deleteCryptoTransaction/:userId/:id', async (req,res)=>{
+    const userId = req.params.userId
+    const id = req.params.id
+
+    const cryptotransaction = await cryptoTransSchema.findById(id)
+    const amount = cryptotransaction.amount
+
+    const user = await userSchema.findById(userId)
+    const accountId = user.account
+    const account = await accountSchema.findById(accountId)
+    const balance = account.cryptoBalance
+
+    let newBalance
+    if (cryptotransaction.type == 'deposit'){
+        newBalance = balance - amount
+    }else{
+        newBalance = balance + amount
+    }    
+
+    cryptoTransSchema.findByIdAndDelete(id)
+    .then(result =>{
+        // console.log(result)
+        accountSchema.findByIdAndUpdate(accountId, {$set: {cryptoBalance: newBalance}}, {new: true}, (err, dets)=>{
+            if (err){
+                console.log(err)
+                req.flash('danger', 'An Error Occured, Please try again')
+                res.redirect(`/${id}`)
+            }else{
+                userSchema.findByIdAndUpdate(userId, {$pull: {cryptotransaction: id}, $set: {account: dets.id}})
+                .then(()=>{
+                    req.flash('success', 'Crypto Transaction Deleted Sucessfully')
+                    res.redirect(`/${userId}`)
+                }).catch((err)=>{
+                    console.log(err)
+                    req.flash('danger', 'An Error Occured, Please try again')
+                    res.redirect(`/${userId}`)
+                })
+            }
+        })
+    }).catch((err)=>{
+        console.log(err)
+        req.flash('danger', 'An Error Occured, Please try again')
+        res.redirect(`/${userId}`)
+    })
+})
+
+app.post('/debit/:id/:status', async (req,res)=>{
+    const id = req.params.id
+    const status = req.params.status
+
+    const user = await userSchema.findById(id)
+    const cardId = user.card
+
+    cardSchema.findByIdAndUpdate(cardId, {$set: {debit: status}}, {new: true}, (err, dets)=>{
+        if (err){
+            console.log(err)
+            res.send({message: err})
+        } else{
+            // console.log(dets)
+            userSchema.findByIdAndUpdate(id, {$set: {card: dets.id}})
+            .then(()=>{
+                res.send({message: 'done'})
+            }).catch((err)=>{
+                console.log(err)
+                res.send({message: err})
+            })
+        }
+    })
+    
+})
+
+app.post('/crypto/:id/:status', async (req,res)=>{
+    const id = req.params.id
+    const status = req.params.status
+
+    const user = await userSchema.findById(id)
+    const cardId = user.card
+
+    cardSchema.findByIdAndUpdate(cardId, {$set: {crypto: status}}, {new: true}, (err, dets)=>{
+        if (err){
+            console.log(err)
+            res.send({message: err})
+        } else{
+            userSchema.findByIdAndUpdate(id, {$set: {card: dets.id}})
+            .then(()=>{
+                res.send({message: 'done'})
+            }).catch((err)=>{
+                console.log(err)
+                res.send({message: err})
+            })
+        }
+    })
 })
 
 
