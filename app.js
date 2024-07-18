@@ -511,11 +511,13 @@ app.get('/deleteTransaction/:userId/:id', async (req,res)=>{
     const account = await accountSchema.findById(accountId)
     const balance = account.balance
 
-    let newBalance
-    if (transaction.type == 'deposit'){
-        newBalance = balance - amount
-    }else{
-        newBalance = balance + amount
+    let newBalance = balance
+    if (transaction.successful == 'true'){
+        if (transaction.type == 'deposit'){
+            newBalance = balance - amount
+        }else{
+            newBalance = balance + amount
+        }
     }
 
     transactionSchema.findByIdAndDelete(id)
