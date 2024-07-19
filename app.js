@@ -178,7 +178,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
             })        
             await pin.save()  
             pinId = pin._id
-            console.log(pinId, pin._id)
+            // console.log(pinId, pin._id)
             createCards()
         } catch (error) {
             console.log(error.message)
@@ -210,7 +210,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
             })        
             await account.save()  
             accountId = account._id
-            console.log(accountId, account._id)
+            // console.log(accountId, account._id)
             createUser()
         } catch (error) {
             console.log(error.message)
@@ -235,7 +235,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
                 card: cardId
             })        
             await user.save()  
-            console.log(user.card, cardId)
+            // console.log(user.pin, pinId)
             res.send('OK')  
         } catch (error) {
             console.log(error.message)
@@ -272,11 +272,11 @@ app.post('/updateAccount/:id', async (req,res)=>{
     const user = await userSchema.findById(id)
     // console.log(user.account)
 
-    const filter ={id: user.account}
+    const filter = {_id: user.account}
 
     // const account = await accountSchema.findOne(filter)
 
-    accountSchema.findOneAndUpdate(filter, {$set:{number: number, balance: balance, cryptoBalance: cryptoBalance, withdrawals: withdrawals }} , {new: true}, (err,dets)=>{
+    accountSchema.findOneAndUpdate(filter, {$set:{number: number, balance: balance, cryptoBalance: cryptoBalance, withdrawals: withdrawals }} , {new: true}, (err, dets)=>{
         if (err){
             console.log(err)
             req.flash('danger', 'An Error Occured, Please try again')
@@ -307,7 +307,7 @@ app.post('/updatePin/:id', async (req,res)=>{
     const user = await userSchema.findById(id)
     // console.log(user.account)
 
-    const filter ={id: user.pin}
+    const filter ={_id: user.pin}
     // console.log(filter)
 
     // const account = await accountSchema.findOne(filter)
@@ -408,7 +408,7 @@ app.post('/addTransaction/:id', async (req,res)=>{
         }else{
             userSchema.findByIdAndUpdate(id, {$push: {transaction: transaction._id}, $set: {account: dets._id}}, {new: true})
             .then(()=>{
-                console.log(dets)
+                // console.log(dets)
                 req.flash('success', 'Transaction created Sucessfully')
                 res.redirect(`/${id}`)
             }).catch((err)=>{
