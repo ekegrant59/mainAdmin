@@ -51,40 +51,40 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something went wrong!');
 });
 
-app.get('/register', (req,res)=>{
-    res.render('register')
-})
+// app.get('/register', (req,res)=>{
+//     res.render('register')
+// })
 
-app.post('/register', async(req,res)=>{
-    const regInfo = req.body
-    const password = regInfo.password
-    const password2 = regInfo.password2
+// app.post('/register', async(req,res)=>{
+//     const regInfo = req.body
+//     const password = regInfo.password
+//     const password2 = regInfo.password2
 
-  if (password != password2){
-    req.flash('danger', 'Passwords do not match, Please Try Again')
-    res.redirect('/register')
-  } else {
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
+//   if (password != password2){
+//     req.flash('danger', 'Passwords do not match, Please Try Again')
+//     res.redirect('/register')
+//   } else {
+//     const salt = await bcrypt.genSalt(10)
+//     const hashedPassword = await bcrypt.hash(password, salt)
   
-      run()
-      async function run(){
-          try {
-              const admin = new adminSchema({
-                  email: regInfo.email,
-                  password: hashedPassword
-              })
-              await admin.save()
-          }
-          catch (err) {
-              console.log(err.message)
+//       run()
+//       async function run(){
+//           try {
+//               const admin = new adminSchema({
+//                   email: regInfo.email,
+//                   password: hashedPassword
+//               })
+//               await admin.save()
+//           }
+//           catch (err) {
+//               console.log(err.message)
           
-          }
-      }
-      req.flash('success', 'Registeration Successful, Please Log In')
-      res.redirect('/signin')
-  } 
-  })
+//           }
+//       }
+//       req.flash('success', 'Registeration Successful, Please Log In')
+//       res.redirect('/signin')
+//   } 
+//   })
 
   function protectAdminRoute(req, res, next){
     const token = req.cookies.admintoken
@@ -178,8 +178,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
             })        
             await pin.save()  
             pinId = pin._id
-            // console.log(pinId, pin._id)
-            createAccounts()
+            console.log(pinId, pin._id)
             createCards()
         } catch (error) {
             console.log(error.message)
@@ -194,6 +193,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
             })
             await card.save()
             cardId = card._id
+            createAccounts()
         } catch(error){
             console.log(error.message)
         }
@@ -210,6 +210,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
             })        
             await account.save()  
             accountId = account._id
+            console.log(accountId, account._id)
             createUser()
         } catch (error) {
             console.log(error.message)
@@ -234,6 +235,7 @@ app.post('/create', protectAdminRoute, async (req,res)=>{
                 card: cardId
             })        
             await user.save()  
+            console.log(user.card, cardId)
             res.send('OK')  
         } catch (error) {
             console.log(error.message)
@@ -387,6 +389,8 @@ app.post('/addTransaction/:id', async (req,res)=>{
     const accountStats = await accountSchema.findById(accountId)
     const balance = accountStats.balance
 
+    console.log(user, accountStats)
+
     let  newBalance = balance
     if (transaction.successful == 'true'){
         if (transaction.type == 'deposit'){
@@ -404,6 +408,7 @@ app.post('/addTransaction/:id', async (req,res)=>{
         }else{
             userSchema.findByIdAndUpdate(id, {$push: {transaction: transaction._id}, $set: {account: dets._id}}, {new: true})
             .then(()=>{
+                console.log(dets)
                 req.flash('success', 'Transaction created Sucessfully')
                 res.redirect(`/${id}`)
             }).catch((err)=>{
